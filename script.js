@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const maxWidth = 15;  // The maximum width of the line when at the center of the interaction radius
     // --- END New width parameters ---
 
-    let mousePos = { x: 0, y: 0 };
+    // Change mousePos to a mutable state for touch
+    let interactionPoint = { x: null, y: null, active: false };
     let lineElements = [];
 
     const lerp = (a, b, t) => a + (b - a) * t;
@@ -72,33 +73,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const lineCenterX = rect.left + rect.width / 2;
             const lineCenterY = rect.top + rect.height / 2;
 
-            const dx = mousePos.x - lineCenterX;
-            const dy = mousePos.y - lineCenterY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
+            // Only animate if there's an active interaction point
             let newTargetTranslateX = 0;
-            let newTargetWidth = minWidth; // Start with the minimum width
+            let newTargetWidth = minWidth;
             let finalColor = 'transparent';
 
-            if (distance < interactionRadius) {
-                const influence = 1 - (distance / interactionRadius);
-                const direction = Math.sign(dx);
-                newTargetTranslateX = -direction * influence * maxMoveDistance;
+            if (interactionPoint.active) {
+                const dx = interactionPoint.x - lineCenterX;
+                const dy = interactionPoint.y - lineCenterY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
 
-                // Calculate new target width based on influence
-                newTargetWidth = lerp(minWidth, maxWidth, influence);
-
-                const movementProgress = Math.abs(newTargetTranslateX) / maxMoveDistance;
-                finalColor = lerpColor(startColor, endColor, movementProgress);
+                if (distance < interactionRadius) {
+                    const influence = 1 - (distance / interactionRadius);
+                    const direction = Math.sign(dx);
+                    newTargetTranslateX = -direction * influence * maxMoveDistance;
+                    newTargetWidth = lerp(minWidth, maxWidth, influence);
+                    const movementProgress = Math.abs(newTargetTranslateX) / maxMoveDistance;
+                    finalColor = lerpColor(startColor, endColor, movementProgress);
+                }
             }
-            
-            // Set the new target translateX and width values
-            line.targetTranslateX = newTargetTranslateX;
-            line.targetWidth = newTargetWidth;
 
             // Interpolate the line's current position and width towards the target
-            line.currentTranslateX = lerp(line.currentTranslateX, line.targetTranslateX, lerpFactor);
-            line.currentWidth = lerp(line.currentWidth, line.targetWidth, lerpFactor);
+            line.currentTranslateX = lerp(line.currentTranslateX, newTargetTranslateX, lerpFactor);
+            line.currentWidth = lerp(line.currentWidth, newTargetWidth, lerpFactor);
 
             // Apply the new position, color, and width
             line.style.transform = `translateX(${line.currentTranslateX}px)`;
@@ -109,9 +106,41 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(animateLines);
     };
 
+    // Use touch events for mobile compatibility
+    window.addEventListener('touchstart', (e) => {
+        // Prevent default browser actions like scrolling or zooming
+        e.preventDefault();
+        const touch = e.touches[0];
+        interactionPoint.x = touch.clientX;
+        interactionPoint.y = touch.clientY;
+        interactionPoint.active = true;
+    }, { passive: false }); // { passive: false } allows preventDefault to work
+
+    window.addEventListener('touchmove', (e) => {
+        const touch = e.touches[0];
+        interactionPoint.x = touch.clientX;
+        interactionPoint.y = touch.clientY;
+    });
+
+    window.addEventListener('touchend', () => {
+        // Deactivate the interaction point to return lines to their original state
+        interactionPoint.active = false;
+        interactionPoint.x = null;
+        interactionPoint.y = null;
+    });
+
+    // Also keep mouse events for desktop users
     window.addEventListener('mousemove', (e) => {
-        mousePos.x = e.clientX;
-        mousePos.y = e.clientY;
+        interactionPoint.x = e.clientX;
+        interactionPoint.y = e.clientY;
+        interactionPoint.active = true;
+    });
+
+    // Add mouseleave to reset on desktop when mouse leaves the viewport
+    window.addEventListener('mouseleave', () => {
+        interactionPoint.active = false;
+        interactionPoint.x = null;
+        interactionPoint.y = null;
     });
 
     populateGrid();
