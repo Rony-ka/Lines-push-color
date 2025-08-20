@@ -8,6 +8,11 @@ html, body {
     overflow: hidden;
     box-sizing: border-box;
     font-family: "Inter", sans-serif;
+    /* Disable text selection and callouts on mobile for a cleaner interaction */
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    /* Prevent default pan and zoom gestures to ensure the touch event is handled by our script */
+    touch-action: none;
 }
 
 body {
@@ -40,10 +45,9 @@ body {
     &::before {
         content: '';
         background-color: var(--line-color, transparent); 
-        width: var(--line-width, 1.5px); /* Changed to a CSS variable */
+        width: var(--line-width, 1.5px);
         height: 46px;
         border-radius: 0px;
-        /* The transition is handled by the JavaScript lerp, but we'll add it back for a smooth color transition. */
         transition: background-color 0.3s ease-out, width 0.3s ease-out;
     }
 }
