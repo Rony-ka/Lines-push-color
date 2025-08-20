@@ -1,0 +1,49 @@
+/* style.css */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+}
+
+body {
+    background-color: #0E0E0E;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+    grid-template-rows: repeat(auto-fill, minmax(45px, 1fr));
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
+    padding: 0px;
+    overflow: hidden;
+}
+
+.line {
+    width: 100%;
+    height: 100%;
+    transform-origin: center center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+
+    &::before {
+        content: '';
+        background-color: var(--line-color, transparent); 
+        width: var(--line-width, 1.5px); /* Changed to a CSS variable */
+        height: 46px;
+        border-radius: 0px;
+        /* The transition is handled by the JavaScript lerp, but we'll add it back for a smooth color transition. */
+        transition: background-color 0.3s ease-out, width 0.3s ease-out;
+    }
+}
