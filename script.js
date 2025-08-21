@@ -9,7 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- END Grid cell dimensions ---
 
     // --- Interaction parameters ---
-    const interactionRadius = 100;
+    const baseInteractionRadius = 100;
+    const maxInteractionRadius = 250; // The maximum radius under full pressure
+    let interactionRadius = baseInteractionRadius; // This will be dynamic
     const maxMoveDistance = 40;
     const lerpFactor = 0.1; // Controls the "lag" or smoothing of the movement
     // --- END Interaction parameters ---
@@ -108,25 +110,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Use touch events for mobile compatibility
     window.addEventListener('touchstart', (e) => {
-        // Prevent default browser actions like scrolling or zooming
         e.preventDefault();
         const touch = e.touches[0];
         interactionPoint.x = touch.clientX;
         interactionPoint.y = touch.clientY;
         interactionPoint.active = true;
-    }, { passive: false }); // { passive: false } allows preventDefault to work
+
+        if (touch.force !== undefined) {
+            const pressure = touch.force;
+            interactionRadius = baseInteractionRadius + (maxInteractionRadius - baseInteractionRadius) * pressure;
+        } else {
+            // Default to base radius for devices without pressure support
+            interactionRadius = baseInteractionRadius;
+        }
+    }, { passive: false });
 
     window.addEventListener('touchmove', (e) => {
         const touch = e.touches[0];
         interactionPoint.x = touch.clientX;
         interactionPoint.y = touch.clientY;
+
+        if (touch.force !== undefined) {
+            const pressure = touch.force;
+            interactionRadius = baseInteractionRadius + (maxInteractionRadius - baseInteractionRadius) * pressure;
+        }
     });
 
     window.addEventListener('touchend', () => {
-        // Deactivate the interaction point to return lines to their original state
         interactionPoint.active = false;
         interactionPoint.x = null;
         interactionPoint.y = null;
+        // Reset the radius to the base value when the touch ends
+        interactionRadius = baseInteractionRadius;
     });
 
     // Also keep mouse events for desktop users
@@ -134,13 +149,16 @@ document.addEventListener('DOMContentLoaded', () => {
         interactionPoint.x = e.clientX;
         interactionPoint.y = e.clientY;
         interactionPoint.active = true;
+        // For mouse, the radius is always the base value
+        interactionRadius = baseInteractionRadius;
     });
 
-    // Add mouseleave to reset on desktop when mouse leaves the viewport
     window.addEventListener('mouseleave', () => {
         interactionPoint.active = false;
         interactionPoint.x = null;
         interactionPoint.y = null;
+        // Reset the radius to the base value when the mouse leaves
+        interactionRadius = baseInteractionRadius;
     });
 
     populateGrid();
