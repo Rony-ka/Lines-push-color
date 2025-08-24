@@ -41,13 +41,13 @@ body {
     justify-content: center;
     align-items: center;
     border-radius: 5px;
-
-    &::before {
-        content: '';
-        background-color: var(--line-color, transparent); 
-        width: var(--line-width, 1.5px);
-        height: 46px;
-        border-radius: 0px;
-        transition: background-color 0.3s ease-out, width 0.3s ease-out;
-    }
+}
+    
+.line::before {
+    content: '';
+    background-color: var(--line-color, rgb(200, 128, 253));
+    width: var(--line-width, 1.5px);
+    height: 46px;
+    border-radius: 0px;
+    transition: background-color 0.3s ease-out, width 0.3s ease-out;
 }
