@@ -17,14 +17,23 @@ html, body {
 
 body {
     background-color: #0E0E0E;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
 }
 
 #grid-container {
+    display: -ms-grid;
     display: grid;
+    -ms-grid-columns: repeat(auto-fill, minmax(20px, 1fr));
     grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+    -ms-grid-rows: repeat(auto-fill, minmax(45px, 1fr));
     grid-template-rows: repeat(auto-fill, minmax(45px, 1fr));
     width: 100vw;
     height: 100vh;
@@ -36,18 +45,29 @@ body {
 .line {
     width: 100%;
     height: 100%;
+    -webkit-transform-origin: center center;
+    -ms-transform-origin: center center;
     transform-origin: center center;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
     border-radius: 5px;
 }
-    
+
 .line::before {
     content: '';
-    background-color: var(--line-color, rgb(200, 128, 253));
+    background-color: var(--line-color, transparent);
     width: var(--line-width, 1.5px);
     height: 46px;
     border-radius: 0px;
+    -webkit-transition: background-color 0.3s ease-out, width 0.3s ease-out;
+    -o-transition: background-color 0.3s ease-out, width 0.3s ease-out;
+    -webkit-transition: background-color 0.3s ease-out, width 0.3s ease-out;
     transition: background-color 0.3s ease-out, width 0.3s ease-out;
 }
