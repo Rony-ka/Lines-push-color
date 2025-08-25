@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Interaction parameters ---
     const interactionRadius = 100;
     const maxMoveDistance = 40;
-    const lerpFactor = 0.02; // A smaller value for a longer trail effect
+    const lerpFactor = 0.1; // Controls the "lag" or smoothing of the movement
     // --- END Interaction parameters ---
 
     // --- Color parameters ---
@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             line.currentWidth = lerp(line.currentWidth, newTargetWidth, lerpFactor);
 
             // Apply the new position, color, and width
+            line.style.webkitTransform = `translateX(${line.currentTranslateX}px)`;
             line.style.transform = `translateX(${line.currentTranslateX}px)`;
             line.style.setProperty('--line-color', finalColor);
             line.style.setProperty('--line-width', `${line.currentWidth}px`);
@@ -108,13 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Use touch events for mobile compatibility
     window.addEventListener('touchstart', (e) => {
-        // Prevent default browser actions like scrolling or zooming
-        e.preventDefault();
         const touch = e.touches[0];
         interactionPoint.x = touch.clientX;
         interactionPoint.y = touch.clientY;
         interactionPoint.active = true;
-    }, { passive: false }); // { passive: false } allows preventDefault to work
+    });
 
     window.addEventListener('touchmove', (e) => {
         const touch = e.touches[0];
